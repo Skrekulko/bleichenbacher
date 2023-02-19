@@ -1,4 +1,6 @@
 from collections import namedtuple
+from timeit import default_timer as timer
+from datetime import timedelta
 from bleichenbacher.oracle import Oracle
 from bleichenbacher.converter import int_to_hex, hex_to_int
 from bleichenbacher.math import mod_pow, floor, ceil
@@ -17,6 +19,12 @@ def bleichenbacher_chosen_plaintext(oracle: Oracle, ciphertext: bytes, conformin
     conforming -- flag indicating the conformity of the input ciphertext
     """
 
+    # Start Recording The Time
+    start_time = timer()
+
+    # Start Recording Calls To The Oracle
+    calls_to_oracle = 0
+
     # Oracle's Parameters
     n = oracle.parameters.n
     n_size = oracle.parameters.size_in_bytes()
@@ -29,12 +37,12 @@ def bleichenbacher_chosen_plaintext(oracle: Oracle, ciphertext: bytes, conformin
 
     # Step 1: Blinding (Only If Ciphertext Is Not PKCS Conforming)
     if not conforming:
-        s = step_1(oracle=oracle, n=n, e=e, c=c)
+        s, calls_to_oracle = step_1(oracle=oracle, n=n, e=e, c=c, calls_to_oracle=calls_to_oracle)
     else:
         s = 1
 
     # Step 2.a: Starting The Search
-    s = step_2a(oracle=oracle, n=n, e=e, c=c, l=ceil(n, 3 * B))
+    s, calls_to_oracle = step_2a(oracle=oracle, n=n, e=e, c=c, l=ceil(n, 3 * B), calls_to_oracle=calls_to_oracle)
 
     # Step 3: Narrowing The Set Of Solutions
     intervals = step_3(n=n, b_range=B, s=s, intervals=intervals)
@@ -42,22 +50,31 @@ def bleichenbacher_chosen_plaintext(oracle: Oracle, ciphertext: bytes, conformin
     while True:
         # Step 2.c: Searching With One Interval Left
         if len(intervals) >= 2:
-            s = step_2a(oracle=oracle, n=n, e=e, c=c, l=s)
+            s, calls_to_oracle = step_2a(oracle=oracle, n=n, e=e, c=c, l=s, calls_to_oracle=calls_to_oracle)
         elif len(intervals) == 1:
             a, b = intervals[0]
 
             # Step 4: Computing The Solution
             if a == b:
-                return b"\x00" + int_to_hex(integer=a % n, byteorder="big")
+                # Stop Recording The Time
+                end_time = timer()
+
+                return dict(
+                    recovered_message=b"\x00" + int_to_hex(integer=a % n, byteorder="big"),
+                    time=timedelta(seconds=end_time - start_time),
+                    calls=calls_to_oracle
+                )
 
             # Step 2.c: Searching With One Interval Left
-            s = step_2c(oracle=oracle, n=n, e=e, c=c, a=a, b=b, prev_s=s, b_range=B)
+            s, calls_to_oracle = step_2c(
+                oracle=oracle, n=n, e=e, c=c, a=a, b=b, prev_s=s, b_range=B, calls_to_oracle=calls_to_oracle
+            )
 
         # Step 3: Narrowing The Set Of Solutions
         intervals = step_3(n=n, b_range=B, s=s, intervals=intervals)
 
 
-def step_1(oracle: Oracle, n: int, e: int, c: int) -> int:
+def step_1(oracle: Oracle, n: int, e: int, c: int, calls_to_oracle: int) -> [int, int]:
     """
     Step 1: Blinding.
 
@@ -78,12 +95,12 @@ def step_1(oracle: Oracle, n: int, e: int, c: int) -> int:
         # Check For PKCS Conformity
         try:
             oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-            return s
+            return s, calls_to_oracle + 1
         except (Exception, ):
             pass
 
 
-def step_2a(oracle: Oracle, n: int, e: int, c: int, l: int) -> int:
+def step_2a(oracle: Oracle, n: int, e: int, c: int, l: int, calls_to_oracle: int) -> [int, int]:
     """
     Step 2.a: Starting the search.
 
@@ -105,12 +122,14 @@ def step_2a(oracle: Oracle, n: int, e: int, c: int, l: int) -> int:
         # Check For PKCS Conformity
         try:
             oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-            return s
+            return s, calls_to_oracle + 1
         except (Exception,):
             s += 1
 
 
-def step_2c(oracle: Oracle, n: int, e: int, c: int, a: int, b: int, prev_s: int, b_range: int) -> int:
+def step_2c(
+        oracle: Oracle, n: int, e: int, c: int, a: int, b: int, prev_s: int, b_range: int, calls_to_oracle: int
+) -> [int, int]:
     """
     Step 2.c: Searching with one interval left.
 
@@ -138,7 +157,7 @@ def step_2c(oracle: Oracle, n: int, e: int, c: int, a: int, b: int, prev_s: int,
             # Check For PKCS Conformity
             try:
                 oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-                return si
+                return si, calls_to_oracle + 1
             except (Exception,):
                 pass
 

@@ -5,7 +5,7 @@ from bleichenbacher.pkcs import decode
 
 def test_bleichenbacher() -> None:
     # RSA Oracle
-    oracle = Oracle(bits=256)
+    oracle = Oracle(bits=1024)
 
     # Message
     message = b"RSA256"
@@ -13,7 +13,13 @@ def test_bleichenbacher() -> None:
     # Ciphertext
     ciphertext = oracle.encrypt(plaintext=message)
 
-    # Recovered Message
-    recovered_message = bleichenbacher_chosen_plaintext(oracle=oracle, ciphertext=ciphertext)
+    # Run The Attack
+    data = bleichenbacher_chosen_plaintext(oracle=oracle, ciphertext=ciphertext, conforming=True)
 
-    assert message == decode(message=recovered_message, n_size=oracle.parameters.size_in_bytes())
+    print(f"Recovered in: {data['time']}")
+    print(f"Calls to oracle: {data['calls']}")
+
+    assert message == decode(message=data['recovered_message'], n_size=oracle.parameters.size_in_bytes())
+
+# @pytest.mark.skip(reason="no way of currently testing this")
+# def test_bleichenbacher
