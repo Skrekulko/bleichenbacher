@@ -96,7 +96,7 @@ def step_1(oracle: Oracle, n: int, e: int, c: int, calls_to_oracle: int) -> [int
         try:
             calls_to_oracle += 1
             oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-            return si, calls_to_oracle
+            return s, calls_to_oracle + 1
         except (Exception, ):
             pass
 
@@ -124,7 +124,7 @@ def step_2a(oracle: Oracle, n: int, e: int, c: int, l: int, calls_to_oracle: int
         try:
             calls_to_oracle += 1
             oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-            return si, calls_to_oracle
+            return s, calls_to_oracle + 1
         except (Exception,):
             s += 1
 
@@ -160,7 +160,7 @@ def step_2c(
             try:
                 calls_to_oracle += 1
                 oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-                return si, calls_to_oracle
+                return si, calls_to_oracle + 1
             except (Exception,):
                 pass
 
