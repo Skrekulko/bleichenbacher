@@ -48,9 +48,10 @@ def bleichenbacher_chosen_plaintext(oracle: Oracle, ciphertext: bytes, conformin
     intervals = step_3(n=n, b_range=B, s=s, intervals=intervals)
 
     while True:
-        # Step 2.c: Searching With One Interval Left
+        # Step 2.b: Searching With More Than One Interval Left
         if len(intervals) >= 2:
-            s, calls_to_oracle = step_2a(oracle=oracle, n=n, e=e, c=c, l=s, calls_to_oracle=calls_to_oracle)
+            s, calls_to_oracle = step_2a(oracle=oracle, n=n, e=e, c=c, l=s + 1, calls_to_oracle=calls_to_oracle)
+        # Step 2.c: Searching With One Interval Left AND Step 4: Computing The Solution
         elif len(intervals) == 1:
             a, b = intervals[0]
 
@@ -96,7 +97,7 @@ def step_1(oracle: Oracle, n: int, e: int, c: int, calls_to_oracle: int) -> [int
         try:
             calls_to_oracle += 1
             oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-            return s, calls_to_oracle + 1
+            return s, calls_to_oracle
         except (Exception, ):
             pass
 
@@ -124,8 +125,8 @@ def step_2a(oracle: Oracle, n: int, e: int, c: int, l: int, calls_to_oracle: int
         try:
             calls_to_oracle += 1
             oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-            return s, calls_to_oracle + 1
-        except (Exception,):
+            return s, calls_to_oracle
+        except (Exception, ):
             s += 1
 
 
@@ -160,8 +161,8 @@ def step_2c(
             try:
                 calls_to_oracle += 1
                 oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
-                return si, calls_to_oracle + 1
-            except (Exception,):
+                return si, calls_to_oracle
+            except (Exception, ):
                 pass
 
         # Increment 'ri' By One
