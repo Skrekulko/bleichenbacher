@@ -2,7 +2,7 @@ import re
 from Crypto.Random import get_random_bytes
 from bleichenbacher.rsa import RSA
 from bleichenbacher.converter import int_to_hex, hex_to_int
-from bleichenbacher.pkcs import encode
+from bleichenbacher.pkcs import encode, decode
 
 
 class Oracle(RSA):
@@ -14,9 +14,11 @@ class Oracle(RSA):
     e    -- RSA public exponent
     """
 
-    def __init__(self, bits=2048, e=65537) -> None:
+    def __init__(self, bits=2048, e=65537, simple_check=False) -> None:
         # Initialize RSA
         super().__init__(bits=bits, e=e)
+
+        self.simple_check = simple_check
 
     def encrypt(self, plaintext: bytes) -> bytes:
         """
@@ -62,7 +64,11 @@ class Oracle(RSA):
         )
 
         # Simple PKCS Conformity Check
-        if len(encoded_message) == self.parameters.size_in_bytes() and encoded_message[:2] == b"\x00\x02":
-            return encoded_message
+        if self.simple_check:
+            if len(encoded_message) == self.parameters.size_in_bytes() and encoded_message[:2] == b"\x00\x02":
+                return encoded_message
+            else:
+                raise Exception("Not PKCS conforming.")
         else:
-            raise Exception("Not PKCS conforming.")
+            decode(message=encoded_message, n_size=self.parameters.size_in_bytes())
+            return encoded_message
