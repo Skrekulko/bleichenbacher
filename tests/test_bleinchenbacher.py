@@ -14,12 +14,6 @@ def test_bleichenbacher() -> None:
     # Number Of Cycles
     n_cycles = 20
 
-    # Create A New Test File
-    file = open("test_results.txt", "a", encoding="utf-8")
-
-    # Write The Date And Time Of The Test
-    file.write(f"{datetime.now()}\n")
-
     # Test For Different RSA Sizes
     for rsa_size in rsa_sizes:
         # Test For Different Check Difficulty
@@ -40,17 +34,21 @@ def test_bleichenbacher() -> None:
                 # Run The Attack
                 data = bleichenbacher_chosen_plaintext(oracle=oracle, ciphertext=ciphertext, conforming=True)
 
+                assert message == decode(message=data['recovered_message'], n_size=oracle.parameters.size_in_bytes())
+
+                # Create A New Test File
+                file = open("test_results.txt", "a", encoding="utf-8")
+
                 # Write The Results To File
+                file.write(f"{datetime.now()}\n")
                 file.write(f"\trsa_{rsa_size}:\n")
                 file.write(f"\t\tsimple={check_type}\n")
                 file.write(f"\t\ttime={data['time']}\n")
                 file.write(f"\t\tcalls={data['calls']}\n")
                 file.write(
-                    f"\t\toriginal="
+                    f"\t\trecovered="
                     f"{decode(message=data['recovered_message'], n_size=oracle.parameters.size_in_bytes())}\n\n"
                 )
 
-                assert message == decode(message=data['recovered_message'], n_size=oracle.parameters.size_in_bytes())
-
-    # Close The File
-    file.close()
+                # Close The File
+                file.close()
