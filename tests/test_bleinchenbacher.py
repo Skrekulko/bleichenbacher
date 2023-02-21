@@ -6,16 +6,13 @@ from bleichenbacher.pkcs import decode
 
 def test_bleichenbacher() -> None:
     # RSA Sizes
-    #rsa_sizes = [256, 512, 1024, 2048, 4096]
-    rsa_sizes = [256]
+    rsa_sizes = [256, 512, 1024, 2048, 4096]
 
     # Check Difficulty (Simple, Advanced)
-    #check_types = [True, False]
-    check_types = [True]
+    check_types = [True, False]
 
     # Number Of Cycles
-    #n_cycles = 20
-    n_cycles = 1
+    n_cycles = 20
 
     # Create A New Test File
     file = open("test_results.txt", "a", encoding="utf-8")
@@ -48,7 +45,10 @@ def test_bleichenbacher() -> None:
                 file.write(f"\t\tsimple={check_type}\n")
                 file.write(f"\t\ttime={data['time']}\n")
                 file.write(f"\t\tcalls={data['calls']}\n")
-                file.write(f"\t\toriginal={decode(message=data['recovered_message'], n_size=oracle.parameters.size_in_bytes())}\n\n")
+                file.write(
+                    f"\t\toriginal="
+                    f"{decode(message=data['recovered_message'], n_size=oracle.parameters.size_in_bytes())}\n\n"
+                )
 
                 assert message == decode(message=data['recovered_message'], n_size=oracle.parameters.size_in_bytes())
 
