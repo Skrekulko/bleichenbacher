@@ -1,15 +1,16 @@
 from collections import namedtuple
 from timeit import default_timer as timer
 from datetime import timedelta
+from random import randint
 from bleichenbacher.oracle import Oracle
 from bleichenbacher.converter import int_to_hex, hex_to_int
 from bleichenbacher.math import mod_pow, floor, ceil
 
-
 Interval = namedtuple("Interval", ["lower_bound", "upper_bound"])
 
 
-def bleichenbacher_chosen_plaintext(oracle: Oracle, ciphertext: bytes, conforming=True) -> bytes:
+def bleichenbacher_chosen_plaintext(oracle: Oracle, ciphertext: bytes, conforming=True) ->\
+        dict[str, bytes, timedelta, int]:
     """
     Implementation of Bleichenbacher's chosen ciphertext attack.
 
@@ -98,7 +99,7 @@ def step_1(oracle: Oracle, n: int, e: int, c: int, calls_to_oracle: int) -> [int
             calls_to_oracle += 1
             oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
             return s, calls_to_oracle
-        except (Exception, ):
+        except (Exception,):
             pass
 
 
@@ -126,7 +127,7 @@ def step_2a(oracle: Oracle, n: int, e: int, c: int, l: int, calls_to_oracle: int
             calls_to_oracle += 1
             oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
             return s, calls_to_oracle
-        except (Exception, ):
+        except (Exception,):
             s += 1
 
 
@@ -162,7 +163,7 @@ def step_2c(
                 calls_to_oracle += 1
                 oracle.decrypt(ciphertext=int_to_hex(integer=c_unknown, byteorder="big"))
                 return si, calls_to_oracle
-            except (Exception, ):
+            except (Exception,):
                 pass
 
         # Increment 'ri' By One
