@@ -41,14 +41,16 @@ The dependencies must be installed for everything to work properly by running th
 
 Users who want to use RSA in sizes less than 1024 bits must make very minor changes to the Crypto module. A few lines of code that are listed below must be commented out. Be aware that this *technique* has weaknesses and will only allow you to use RSA with a minimum of 256 bits.
 
-#### RSA.py
+The Crypto module will most likely be located in *bleichenbacher\venv\lib\python3.10\site-packages*.
+
+#### Crypto\Public\RSA.py
 
 ```python
 #if bits < 1024:
     #raise ValueError("RSA modulus length must be >= 1024")
 ```
 
-#### Primality.py
+#### Crypto\Math\Primality.py
 
 ```python
 #if exact_bits < 160:
