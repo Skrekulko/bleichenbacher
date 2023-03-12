@@ -1,6 +1,51 @@
 # Bleichenbacher's Chosen Ciphertext Attack Against Protocols Based on the RSA Encryption Standard PKCS #1
 
+## What It Is
+
  TODO: theory
+
+## Structure
+
+```
+    .
+    ├── bleichenbacher
+    │   ├── bleichenbacher.py
+    │   ├── converter.py
+    │   ├── math.py
+    │   ├── oracle.py
+    │   ├── pkcs.py
+    │   └── rsa.py
+    ├── tests
+    │   ├── test_bleichenbacher.py
+    │   ├── test_converter.py
+    │   ├── test_math.py
+    │   ├── test_oracle.py
+    │   ├── test_pkcs.py
+    │   └── test_rsa.py
+    ├── LICENSE
+    ├── README.md
+    └── requirements.txt
+```
+
+### Modules
+
+As seen above, in the repository structure, there are six main modules:
+
+- **bleichenbacher** - Actual implementation of the Bleichenbacher's attack.
+
+- **converter** - Functions to convert integer to hexadecimal bytes object.
+
+- **math** - Binary modular exponentiation function, and floor and ceil functions for large integers.
+
+- **oracle** - Code for simulating a server (oracle) with RSA and PKCS #1 standard.
+
+- **pkcs** - Implementation of the PKCS #1 standard.
+
+- **rsa** - Implementation of RSA.
+
+### Tests
+
+Test for each corresponding module has a "**test\_**" prefix added to it, e.g. test for the *bleichenbacher.py* module is **test\_bleichenbacher.py**.
 
 ## How To Run
 
@@ -39,7 +84,7 @@ The dependencies must be installed for everything to work properly by running th
 
 ### Use Smaller RSA
 
-Users who want to use RSA in sizes less than 1024 bits must make very minor changes to the Crypto module. A few lines of code that are listed below must be commented out. Be aware that this *technique* has weaknesses and will only allow you to use RSA with a minimum of 256 bits.
+To use smaller RSA than 1024 bits, a very minor changes must be made to the Crypto library. A few lines of code that are listed below must be ***commented out***. Be aware that this *technique* has weaknesses and will only allow you to use RSA with a minimum of 256 bits.
 
 The Crypto module will most likely be located in *bleichenbacher\venv\lib\python3.10\site-packages*.
 
@@ -85,7 +130,7 @@ The configuration options for the test that runs the Bleichenbacher's implementa
 
 ##### RSA Sizes
 
-Due to the limitations of the Crypto module from PyCryptodome, the minimal required size for RSA is 256. As usual, the bigger the RSA size, the more it takes to crack it, so don't expect to break RSA-4096 in a few seconds.
+Due to the limitations of the Crypto library from PyCryptodome, the minimal required size for RSA is 256. As usual, the bigger the RSA size, the more it takes to crack it, so don't expect to break RSA-4096 in a few seconds.
 
 ```python
 # RSA Sizes
