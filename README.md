@@ -2,7 +2,13 @@
 
 ## What It Is
 
- TODO: theory
+[Bleichenbacher's CCA](https://link.springer.com/chapter/10.1007/BFb0055716) (Chosen Ciphertext Attack) attack is a type of cryptographic attack that targets the RSA-based encryption scheme known as [PKCS#1 v1.5](https://www.rfc-editor.org/rfc/rfc8017). The attack takes advantage of a weakness in the padding scheme used by PKCS#1 v1.5, allowing an attacker to decrypt ciphertexts without knowing the private key.
+
+To carry out the attack, the attacker first sends carefully crafted ciphertexts to the target system, which decrypts them and returns an error message if the padding is invalid. By analyzing the error messages, the attacker can learn information about the structure of the ciphertext and use it to gradually deduce the original plaintext.
+
+Bleichenbacher's CCA attack was first discovered by Swiss cryptographer Daniel Bleichenbacher in 1998, and since then, several variations of the attack have been developed. The original attack required tens of thousands of queries to decrypt a single ciphertext, but later variations have been able to accomplish the same task with fewer queries.
+
+To prevent this attack, it is recommended to use a more secure padding scheme such as OAEP (Optimal Asymmetric Encryption Padding). Additionally, careful implementation of PKCS#1 v1.5 can also mitigate the risk of this attack. For example, the error message returned by the decryption function can be made constant-time, so that attackers cannot use it to gain information about the plaintext.
 
 ## Structure
 
