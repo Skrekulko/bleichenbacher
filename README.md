@@ -8,7 +8,7 @@ In the Cryptography course, the task is to carry out an independent project focu
 
 ### Objectives Of The Project
 
-The main goal of the semester project is to implement the original Bleichenbacher attack with ciphertext option on the RSA encryption standard PKCS #1 and then to analyze its computational and time requirements and implement measures to prevent the execution of this attack. Another objective is to learn and define the basic types of cryptosystem attacks, and to define cryptosystems susceptible to the ciphertext-option attack.
+The main goal of this project is to implement the original Bleichenbacher attack with ciphertext option on the RSA encryption standard PKCS #1 and then to analyze its computational and time requirements and implement measures to prevent the execution of this attack. Another objective is to learn and define the basic types of cryptosystem attacks, and to define cryptosystems susceptible to the ciphertext-option attack.
 
 ## Theory
 
